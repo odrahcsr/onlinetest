@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Online Test</title>
+  <title>Online Test with Anti-Cheat</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
+    body { font-family: Arial; padding: 20px; }
     #warning { color: red; font-weight: bold; display: none; }
     #ended { display: none; font-size: 24px; color: white; background: red; padding: 20px; }
   </style>
@@ -13,14 +13,14 @@
   <h1>📝 Online Test</h1>
 
   <div id="test">
-    <p>1. What is 5 + 7?</p>
+    <p>1. What is 10 x 10?</p>
     <input type="text"><br><br>
 
-    <p>2. What is the capital of France?</p>
+    <p>2. What is the color of the sky?</p>
     <input type="text"><br><br>
 
     <button onclick="submitTest()">Submit Test</button>
-    <p id="warning">⚠️ Warning: Do not leave the tab again!</p>
+    <p id="warning">⚠️ Warning: You left the test window!</p>
   </div>
 
   <div id="ended">
@@ -31,18 +31,24 @@
     let violations = 0;
     const MAX_VIOLATIONS = 2;
 
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) {
-        violations++;
-        console.warn(`Tab switch detected. Violation #${violations}`);
+    function handleViolation(source) {
+      violations++;
+      console.warn(`Violation #${violations} from: ${source}`);
 
-        if (violations >= MAX_VIOLATIONS) {
-          document.getElementById("test").style.display = "none";
-          document.getElementById("ended").style.display = "block";
-        } else {
-          document.getElementById("warning").style.display = "block";
-        }
+      if (violations >= MAX_VIOLATIONS) {
+        document.getElementById("test").style.display = "none";
+        document.getElementById("ended").style.display = "block";
+      } else {
+        document.getElementById("warning").style.display = "block";
       }
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) handleViolation("Tab switch (visibilitychange)");
+    });
+
+    window.addEventListener("blur", () => {
+      handleViolation("App switch or browser unfocus (blur)");
     });
 
     function submitTest() {
